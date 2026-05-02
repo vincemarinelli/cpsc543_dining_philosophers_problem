@@ -1,1 +1,1 @@
-# Analysis of the Travelling Saleman Problem in Java
+# Analysis of the Dining Philosohpers Problem in Java
