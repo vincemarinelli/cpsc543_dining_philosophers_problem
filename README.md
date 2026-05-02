@@ -1,1 +1,1 @@
-# Analysis of the Dining Philosohpers Problem in Java
+# Analysis of the Dining Philosophers Problem in Java
