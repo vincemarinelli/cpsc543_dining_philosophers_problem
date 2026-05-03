@@ -6,7 +6,19 @@ import model.RunnerConfig;
 import net.jcip.annotations.ThreadSafe;
 import solutions.DiningRunner;
 
-/** Daemon monitor that detects philosopher starvation by tracking cycle-count gaps. */
+/**
+ * Daemon monitor that detects philosopher starvation by tracking cycle-count gaps.
+ *
+ * <p>A philosopher is considered starved if the gap between its cycle count and the cycle count
+ * of the philosopher with the highest cycle count exceeds a threshold. The threshold is computed
+ * as the maximum of the configured starvation cycle threshold and the starvation relative
+ * fraction of the leader's cycle count.
+ *
+ * Formula: {@code threshold = max(starvationCycleThreshold, leader * starvationRelativeFraction)}
+ *
+ * starvationRelativeFraction is computed as {@code fraction * leader.getCyclesCompleted()}
+ * where {@code fraction} is the configured starvation relative fraction.
+ */
 @ThreadSafe
 public class StarvationDetector implements Runnable {
 

@@ -53,6 +53,8 @@ public class SimulationStats {
    * Computes Jain's Fairness Index over {@code totalEatingMs} for each philosopher.
    * Returns 1.0 (perfectly fair) when all philosophers eat equally.
    *
+   * Forumla: (∑(eating time))² ÷ (# philosophers * ∑(eating time)²)
+   *
    * @param philosophers the list of philosophers to evaluate
    * @return fairness index in the range [1/N, 1.0]
    */
@@ -68,6 +70,7 @@ public class SimulationStats {
     if (sumX2 == 0) {
       return 1.0;
     }
+    // NOTE --> square of sums != sum of squares
     return (sumX * sumX) / (n * sumX2);
   }
 }

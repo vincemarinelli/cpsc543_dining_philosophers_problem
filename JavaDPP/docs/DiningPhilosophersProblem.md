@@ -3,17 +3,16 @@
 This document explores the Dining Philosophers Problem and its various approaches to solving the synchronization and deadlock issues. It examines the classic solution using ordered lock acquisition, as well as more advanced techniques like message passing and monitors. The focus is on understanding the challenges of concurrent programming and the trade-offs between different synchronization mechanisms. The implementation of these solutions in Java is analyzed in detail, highlighting the design decisions and trade-offs involved in applying each approach.
 
 ## The Dining Philosophers Problem
-The Dining Philosophers Problem is one of the most iconic concurrency problems in computer science, originally introduced by Edsger Dijkstra in 1965 [3] as an exam problem relating to computers competing for access to shared resources. The problem, as now known, was reformuated by Tony Hoare to illustrate the challenges of resource allocation and synchronization in concurrent systems.
+The Dining Philosophers Problem is one of the most iconic concurrency problems in computer science, originally introduced by Edsger Dijkstra in 1965 [1] as an exam problem relating to computers competing for access to shared resources. The problem, as now known, was reformuated by Tony Hoare to illustrate the challenges of resource allocation and synchronization in concurrent systems [2].
 
 ### The Problem As Written By Hoare
 
-The text below is a copy of the original problem statement from the book **Communicating Sequential Processes** by C.A.R. Hoare[1].
+The text below is a copy of the original problem statement from the book **Communicating Sequential Processes** by C.A.R. Hoare [2].
 
 #### _2.5 Example: The Dining Philosophers_
-_In ancient times, a wealthy philanthropist endowed a College to accommodate five eminent philosophers. Each philosopher had a room in which he could engage in his professional activity of thinking; there was also a common dining room, furnished with a circular table, surrounded by five chairs, each labelled by the name of the philosopher who was to sit in it. The names of the philosophers were PHIL0, PHIL1, PHIL2, PHIL3, PHIL4, and they were disposed in this order anticlockwise around the table. To the left of each philosopher there was laid a golden fork, and in the centre stood a large bowl of spaghetti, which was
-constantly replenished. A philosopher was expected to spend most of his time thinking; but when he felt hungry, he went to the dining room, sat down in his own chair, picked up his own fork on his left, and plunged it into the spaghetti. But such is the tangled nature of spaghetti that a second fork is required to carry it to the mouth. The philosopher therefore had also to pick up the fork on his right. When we was finished he would put down both his forks, get up from his chair, and continue thinking. Of course, a fork can be used by only one philosopher at a time.  If the other philosopher wants it, he just has to wait until the fork is available again._
+_In ancient times, a wealthy philanthropist endowed a College to accommodate five eminent philosophers. Each philosopher had a room in which he could engage in his professional activity of thinking; there was also a common dining room, furnished with a circular table, surrounded by five chairs, each labelled by the name of the philosopher who was to sit in it. The names of the philosophers were PHIL0, PHIL1, PHIL2, PHIL3, PHIL4, and they were disposed in this order anticlockwise around the table. To the left of each philosopher there was laid a golden fork, and in the centre stood a large bowl of spaghetti, which was constantly replenished. A philosopher was expected to spend most of his time thinking; but when he felt hungry, he went to the dining room, sat down in his own chair, picked up his own fork on his left, and plunged it into the spaghetti. But such is the tangled nature of spaghetti that a second fork is required to carry it to the mouth. The philosopher therefore had also to pick up the fork on his right. When we was finished he would put down both his forks, get up from his chair, and continue thinking. Of course, a fork can be used by only one philosopher at a time.  If the other philosopher wants it, he just has to wait until the fork is available again._
 
-### Brief Problem Statement [2]
+### Brief Problem Statement [2][3]
 Five philosophers sit around a circular table. Between each pair of adjacent philosophers lies a single chopstick (five total). Each philosopher progresses cyclically through the following states:
 
 - **Thinking** — requires no resources
@@ -32,7 +31,7 @@ The task is to devise an algorithm for allocating resources (chopsticks) among t
 - prevents deadlocks
 - prevents starvation (literally in this case...)
 
-### Core Concurrency Hazards Illustrated By This Problem
+### Core Concurrency Hazards Illustrated By This Problem [1]
 1. **Deadlock**<br>
    If every philosopher simultaneously picks up their left chopstick, none can pick up their right — they wait forever. This is the classic circular-wait deadlock.
 2. **Starvation**<br>
@@ -44,16 +43,16 @@ The task is to devise an algorithm for allocating resources (chopsticks) among t
 
 ### Solution Strategies Examined Here
 There are a number of approaches described in the literature, and there is a significant amount of variation in how each solution is implemented. In order to constrain scope and stay focused on solutions that utilize Java concurrency toolsets, we will examine these four common approaches:
-1. Resource Hierarchy (Dijkstra's Original) [3]
+1. Resource Hierarchy (Dijkstra's Original) [3][4][7][8]
    Number the chopsticks 0 through N-1. Each philosopher always picks up the lower-numbered chopstick first. This breaks the circular-wait condition, eliminating deadlock. It's simple but can cause starvation.
-1. Arbitrator / Waiter Pattern [2]
+1. Arbitrator / Waiter Pattern [4][7][8]
    A central "waiter" controls access — a philosopher must ask permission before picking up chopsticks. The waiter only grants permission if both are available. This prevents deadlock but introduces a bottleneck and reduces parallelism.
-1. Chandy/Misra (Message Passing) [4]
+1. Chandy/Misra (Message Passing) [5][7][8]
    Chopsticks are passed between philosophers via requests and replies, with a "dirty/clean" token to ensure fairness. Eliminates both deadlock and starvation but is complex to implement.
-1. Monitor / Condition Variable Approach [5]
+1. Monitor / Condition Variable Approach [6][8][9]
    Each philosopher's state (THINKING, HUNGRY, EATING) is tracked. A philosopher only picks up chopsticks when both neighbors are not eating, enforced via a monitor and condition variables. This is the most natural fit for Java's concurrency model.
 
-## How These Techniques Can Be Applied Using Java
+## How These Techniques Can Be Applied Using Java [11][12]
 
 Java provides several mechanisms that map directly onto these solutions:
 
@@ -77,7 +76,7 @@ Java provides several mechanisms that map directly onto these solutions:
 
 ## Solution Designs
 
-### 1. `ResourceHierarchyAlgorithm` [3]
+### 1. `ResourceHierarchyAlgorithm` [3][4][7][8]
 
 - Each chopstick is numbered 0 through N-1.
 - Each philosopher always acquires the lower-numbered chopstick before the higher-numbered one.
@@ -93,7 +92,7 @@ Philosopher i acquires: min(i, (i+1)%N) first, then max(i, (i+1)%N)
 
 *Source: [drawio/activity-resource-hierarchy.drawio](../drawio/activity-resource-hierarchy.drawio)*
 
-### 2. `ArbitratorAlgorithm` [2]
+### 2. `ArbitratorAlgorithm` [2][4][7][8]
 
 - A central `Waiter` controls access. A philosopher requests permission before picking up either chopstick; the waiter grants only when both adjacent chopsticks are free.
 - Implemented with a `synchronized` method on the waiter; waiting philosophers call `wait()` and the waiter calls `notifyAll()` on each release.
@@ -103,7 +102,7 @@ Philosopher i acquires: min(i, (i+1)%N) first, then max(i, (i+1)%N)
 
 *Source: [drawio/activity-arbitrator.drawio](../drawio/activity-arbitrator.drawio)*
 
-### 3. `ChandyMisraAlgorithm` [4]
+### 3. `ChandyMisraAlgorithm` [5][7][8]
 
 - Each chopstick is either *clean* or *dirty* and owned by exactly one philosopher.
 - Initially all chopsticks are dirty, held by the lower-numbered neighbor.
@@ -122,7 +121,7 @@ Per philosopher i:
 
 *Source: [drawio/activity-chandy-misra.drawio](../drawio/activity-chandy-misra.drawio)*
 
-### 4. `MonitorAlgorithm` [5]
+### 4. `MonitorAlgorithm` [6][8][9]
 
 - Global `state[]` array tracks `THINKING`, `HUNGRY`, or `EATING` for each philosopher.
 - A philosopher can only enter `EATING` when both neighbors are not `EATING`.
@@ -140,19 +139,19 @@ private final PhilosopherState[] state = new PhilosopherState[N];
 
 ## Design Decisions
 
-### Chopstick Uses `lockInterruptibly()`
+### Chopstick Uses `lockInterruptibly()` [12]
 
 `Chopstick.acquire()` calls `lock.lockInterruptibly()` rather than `lock.lock()`. Java's `ReentrantLock.lock()` ignores interrupts, so if `stop()` interrupted a philosopher thread while it was blocked waiting for a chopstick, the thread would never unblock. Using `lockInterruptibly()` means that calling `p.interrupt()` from `stop()` immediately throws `InterruptedException`, allowing the philosopher thread to exit cleanly. This also means `synchronized` blocks cannot be used for the chopstick in Resource Hierarchy or Monitor — `synchronized` does not support interruptible lock acquisition, which is why `ReentrantLock` was chosen for both algorithms.
 
-### `volatile` Fields for Philosopher State
+### `volatile` Fields for Philosopher State [12]
 
 Each `Philosopher` tracks its current state and accumulated timing via `volatile` fields rather than `synchronized` getters. The three monitor daemon threads (`StarvationDetector`, `LivelockDetector`, `DeadlockDetector`) read these fields on every poll cycle. Using `volatile` provides safe visibility to those reader threads without requiring the monitor to acquire a lock on the philosopher, keeping the monitor polling path out of the critical section. The fields are written only by the owning philosopher thread, so there is no write-write race.
 
-### Idempotent `stop()` via `AtomicBoolean.compareAndSet`
+### Idempotent `stop()` via `AtomicBoolean.compareAndSet` [12]
 
 Every algorithm guards its `stop(reason)` method with `AtomicBoolean.compareAndSet(false, true)`. All three monitor daemons share a reference to the same runner and any one of them may call `stop()` when a condition is detected. Without the compare-and-set guard, a second or third daemon arriving milliseconds later would re-interrupt already-exited philosopher threads and potentially double-print error messages. The guard ensures that exactly one caller wins and all subsequent calls are silently ignored.
 
-### One Inbox Per Philosopher in Chandy/Misra
+### One Inbox Per Philosopher in Chandy/Misra [5][12]
 
 The Chandy/Misra implementation uses one `LinkedBlockingQueue` per philosopher (an inbox) rather than two directed queues per adjacent pair. Both neighbors of philosopher *i* write into `inboxes[i]`; the `Message.senderId` field identifies the sender so the receiver knows which fork direction the message refers to. This halves the number of queues (N vs. 2N for a ring) and avoids the asymmetric naming required for directed pair-channels, at the small cost of a one-field discriminator in every message.
 
@@ -160,29 +159,62 @@ The Chandy/Misra implementation uses one `LinkedBlockingQueue` per philosopher (
 
 `StarvationDetector`, `LivelockDetector`, and `DeadlockDetector` each run on a dedicated daemon thread and poll every `progressPollIntervalMs` (default 200 ms). The `AtomicBoolean` stop guard described above ensures that whichever daemon fires first terminates the run; the others poll once more, find the runner already stopped, and exit. The deadlock detector uses two complementary mechanisms: `ThreadMXBean.findDeadlockedThreads()` for lock-based circular waits (algorithms 1, 2, 4) and a progress-stall check — no cycles completed across `noProgressPollLimit` (default 30) consecutive polls with all non-terminated threads in `BLOCKED`, `WAITING`, or `TIMED_WAITING` state — to catch queue-based blocking in Chandy/Misra, which is invisible to the JVM's lock-cycle detector.
 
-## Live Demo
-
 ## Comparison of Solutions
 
 ### Theoretical Properties
 
 All four algorithms guarantee freedom from deadlock, but by different mechanisms and with different fairness guarantees.
 
-**Resource Hierarchy** [3] prevents deadlock by breaking the circular-wait condition: globally consistent lock ordering ensures no cycle of dependencies can form. However, it provides no fairness guarantee — a fortunate subset of neighbors can repeatedly acquire chopsticks first, indefinitely blocking another philosopher.
+**Resource Hierarchy** prevents deadlock by breaking the circular-wait condition: globally consistent lock ordering ensures no cycle of dependencies can form. However, it provides no fairness guarantee — a fortunate subset of neighbors can repeatedly acquire chopsticks first, indefinitely blocking another philosopher. [3][4][8]
 
-**Arbitrator** [2] prevents deadlock by ensuring no philosopher ever holds one chopstick while waiting for the other: both are granted atomically or not at all. Like Resource Hierarchy, it uses `notifyAll()` on each release, creating a thundering-herd race with no ordering guarantee, so starvation remains possible.
+**Arbitrator** prevents deadlock by ensuring no philosopher ever holds one chopstick while waiting for the other: both are granted atomically or not at all. Like Resource Hierarchy, it uses `notifyAll()` on each release, creating a thundering-herd race with no ordering guarantee, so starvation remains possible. [4][7][8][11]
 
-**Chandy/Misra** [4] guarantees both deadlock freedom and starvation freedom through its dirty/clean protocol. Once a philosopher has sent a `REQUEST`, the dirty-fork rule ensures the holder will eventually clean and send it — no request is permanently deferred.
+**Chandy/Misra** guarantees both deadlock freedom and starvation freedom through its dirty/clean protocol. Once a philosopher has sent a `REQUEST`, the dirty-fork rule ensures the holder will eventually clean and send it — no request is permanently deferred. [5][12]
 
-**Monitor** [5] guarantees both deadlock freedom and starvation freedom through targeted per-philosopher `Condition` signals. `putDown(i)` calls `test()` on both neighbors, waking only those who are now eligible to eat, avoiding the thundering-herd broadcast.
+**Monitor** guarantees both deadlock freedom and starvation freedom through targeted per-philosopher `Condition` signals. `putDown(i)` calls `test()` on both neighbors, waking only those who are now eligible to eat, avoiding the thundering-herd broadcast problem. [6][11][12]
 
-| Property | Resource Hierarchy [3] | Arbitrator [2] | Chandy/Misra [4] | Monitor [5] |
+| Property | Resource Hierarchy | Arbitrator | Chandy/Misra | Monitor |
 |---|:---:|:---:|:---:|:---:|
 | Deadlock-free | ✓ | ✓ | ✓ | ✓ |
 | Starvation-free | ✗ | ✗ | ✓ | ✓ |
 | Coordination mechanism | Ordered lock acquisition | Central waiter | Dirty/clean message passing | Shared state + per-philosopher conditions |
 | Max simultaneous eaters (N=5) | 2 | 2 | 2 | 2 |
 | Lock on chopstick objects | ✓ | ✗ | ✗ | ✗ |
+
+### Evaluation Methodology
+
+#### Simulation Parameters
+
+Each run configures the number of philosophers N and a target cycle count. Think and eat durations are sampled uniformly from [100 ms, 500 ms] unless otherwise noted. A **cycle** is defined as one complete HUNGRY → EATING → THINKING transition; `cyclesCompleted` is incremented on the EATING → THINKING transition.
+
+#### Metrics Collected
+
+- **Wall-clock time** — elapsed time from `runner.start()` to all philosopher threads completing or being stopped.
+- **Cycles completed** — per-philosopher count of complete eat-think cycles.
+- **Total eating time** — cumulative milliseconds each philosopher spent in the EATING state.
+- **Avg hungry wait** — each philosopher's time in HUNGRY as a percentage of total wall-clock time, averaged across all philosophers.
+
+#### Monitor Daemons
+
+Three daemon threads observe the simulation and terminate it early if a hazard is detected, each polling every 200 ms:
+
+- **StarvationDetector** — fires when any philosopher's `cyclesCompleted` falls more than threshold T behind the leader. A run terminated by this detector is recorded as a **Starvation** outcome.
+- **LivelockDetector** — fires when total `cyclesCompleted` across all philosophers is unchanged for 30 consecutive polls while at least one thread is RUNNABLE.
+- **DeadlockDetector** — fires via JVM lock-cycle detection (`ThreadMXBean.findDeadlockedThreads()`) for lock-based algorithms (1, 2, 4), or via progress stagnation with all threads BLOCKED/WAITING for Chandy/Misra, where queue-blocking is invisible to the JVM detector.
+
+#### Adaptive Starvation Threshold
+
+The starvation detector uses `T = max(10, ⌊leaderCycles × 0.20⌋)`. The absolute floor of 10 governs early in a run; once the leader passes 50 cycles the relative term grows above 10, scaling the allowed gap with run progress. This prevents false positives at large N where random timing variance in starvation-free algorithms would temporarily exceed a fixed threshold before the target cycle count is reached.
+
+#### Jain's Fairness Index [10]
+
+Jain's Fairness Index (JFI) quantifies how equitably eating time is distributed across N philosophers [10]:
+
+```
+F = (Σ eatingTime_i)² / (N × Σ eatingTime_i²)
+```
+
+F ranges from 1/N (completely unfair — one philosopher receives all resources) to 1.0 (perfectly fair — all philosophers eat equally). For N=5, F ≥ 0.99 indicates excellent fairness. JFI was chosen because it is scale-invariant, sensitive to outliers, and produces a single scalar summarizing the eating-time distribution across all philosophers regardless of N.
 
 ### Simulation Results
 
@@ -194,10 +226,10 @@ At N=5 with only 50 target cycles the leader never surpasses 50 cycles, so the r
 
 | Algorithm | Wall-clock | Outcome | Avg cycle | JFI†† (eating time) | Avg hungry wait |
 |---|---|---|---|---|---|
-| Resource Hierarchy [3] | 37.533 s | **Starvation** (P3=47 cy, P0=36 cy) | ~910 ms† | 0.9872 | 28% |
-| Arbitrator [2] | 42.554 s | Completed | 828 ms | **0.9958** | 25% |
-| Chandy/Misra [4] | 50.828 s | Completed | 984 ms | 0.9955 | 37% |
-| Monitor [5] | 42.735 s | Completed | 831 ms | 0.9890 | **24%** |
+| Resource Hierarchy | 37.533 s | **Starvation** (P3=47 cy, P0=36 cy) | ~910 ms† | 0.9872 | 28% |
+| Arbitrator | 42.554 s | Completed | 828 ms | **0.9958** | 25% |
+| Chandy/Misra | 50.828 s | Completed | 984 ms | 0.9955 | 37% |
+| Monitor | 42.735 s | Completed | 831 ms | 0.9890 | **24%** |
 
 *† Average at termination, not a full-50-cycle figure.*
 *†† JFI --> Jain Fairness Index*
@@ -208,15 +240,15 @@ Starvation was triggered at 37.533 s: P3 completed 47 cycles while P0 reached on
 
 ##### Arbitrator
 
-The Arbitrator completed all 50 cycles in 42.554 s. Eating time ranged from 14,268 ms (P4) to 16,386 ms (P2), a spread of ~2,118 ms. The JFI of 0.9958 was the best in this run. Average hungry-wait (25%) is modest, and the single `synchronized` waiter serializes all requests cleanly at N=5 without measurable throughput penalty [2].
+The Arbitrator completed all 50 cycles in 42.554 s. Eating time ranged from 14,268 ms (P4) to 16,386 ms (P2), a spread of ~2,118 ms. The JFI of 0.9958 was the best in this run. Average hungry-wait (25%) is modest, and the single `synchronized` waiter serializes all requests cleanly at N=5 without measurable throughput penalty.
 
 ##### Chandy/Misra
 
-Chandy/Misra completed all 50 cycles with the highest coordination overhead: average cycle time 984 ms and 37% of thread time in HUNGRY. Eating time ranged from 14,525 ms (P2) to 17,422 ms (P3), a spread of ~2,897 ms. The JFI of 0.9955 reflects the per-cycle overhead from the 50 ms inbox-polling interval compounding across the run [4].
+Chandy/Misra completed all 50 cycles with the highest coordination overhead: average cycle time 984 ms and 37% of thread time in HUNGRY. Eating time ranged from 14,525 ms (P2) to 17,422 ms (P3), a spread of ~2,897 ms. The JFI of 0.9955 reflects the per-cycle overhead from the 50 ms inbox-polling interval compounding across the run.
 
 ##### Monitor
 
-Monitor was the fastest finisher (42.735 s) with the lowest hungry-wait (24%) and the strongest JFI among completers per this run. Eating time ranged from 13,461 ms (P4) to 17,311 ms (P1), a spread of ~3,850 ms. Targeted `self[i].signal()` wakeups prevent thundering-herd behavior and keep per-cycle overhead minimal [5].
+Monitor was the fastest finisher (42.735 s) with the lowest hungry-wait (24%) and the strongest JFI among completers per this run. Eating time ranged from 13,461 ms (P4) to 17,311 ms (P1), a spread of ~3,850 ms. Targeted `self[i].signal()` wakeups prevent thundering-herd behavior and keep per-cycle overhead minimal.
 
 ---
 
@@ -226,10 +258,10 @@ The adaptive threshold grows with the leader: once the leader passes 55 cycles, 
 
 | Algorithm | Wall-clock | Outcome | Cycles (min/max) | Avg cycle | JFI | Avg hungry wait |
 |---|---|---|---|---|---|---|
-| Resource Hierarchy [3] | 27.586 s | **Starvation** (structural) | 25–36 | 938 ms | 0.9837 | 34% |
-| Arbitrator [2] | 419.113 s | **Completed** | 500–500 | 815 ms | **0.9995** | 25% |
-| Chandy/Misra [4] | 468.984 s | **Completed** | 500–500 | 922 ms | **0.9997** | 33% |
-| Monitor [5] | 414.877 s | **Completed** | 500–500 | 816 ms | 0.9996 | **25%** |
+| Resource Hierarchy | 27.586 s | **Starvation** (structural) | 25–36 | 938 ms | 0.9837 | 34% |
+| Arbitrator | 419.113 s | **Completed** | 500–500 | 815 ms | **0.9995** | 25% |
+| Chandy/Misra | 468.984 s | **Completed** | 500–500 | 922 ms | **0.9997** | 33% |
+| Monitor | 414.877 s | **Completed** | 500–500 | 816 ms | 0.9996 | **25%** |
 
 ##### Resource Hierarchy
 
@@ -255,10 +287,10 @@ At N=21 the threshold grows further: 100 ms per cycle at cycle=500. All starvati
 
 | Algorithm | Wall-clock | Outcome | Cycles (min/max) | Avg cycle | JFI | Avg hungry wait |
 |---|---|---|---|---|---|---|
-| Resource Hierarchy [3] | 31.995 s | **Starvation** (structural) | 29–40 | ~930 ms | 0.9906 | ~33% |
-| Arbitrator [2] | 415.292 s | **Completed** | 500–500 | 814 ms | **0.9995** | 24% |
-| Chandy/Misra [4] | ~467 s | **Completed** | 500–500 | 909 ms | 0.9997 | 33% |
-| Monitor [5] | ~414 s | **Completed** | 500–500 | 813 ms | 0.9998 | **24%** |
+| Resource Hierarchy | 31.995 s | **Starvation** (structural) | 29–40 | ~930 ms | 0.9906 | ~33% |
+| Arbitrator | 415.292 s | **Completed** | 500–500 | 814 ms | **0.9995** | 24% |
+| Chandy/Misra | ~467 s | **Completed** | 500–500 | 909 ms | 0.9997 | 33% |
+| Monitor | ~414 s | **Completed** | 500–500 | 813 ms | 0.9998 | **24%** |
 
 ##### Resource Hierarchy
 
@@ -276,7 +308,7 @@ Chandy/Misra completed all 500 cycles in approximately 467 s. Eating time ranged
 
 Monitor completed all 500 cycles in approximately 414 s. Eating time ranged from 149,506 ms (P13) to 157,501 ms (P19), a spread of ~7,995 ms over 500 cycles — 16 ms per cycle of variance, the tightest across all algorithms at N=21. The JFI of 0.9998 is the best single result in this run. Average hungry-wait (24%) ties Arbitrator; targeted per-philosopher signals keep throughput high regardless of N.
 
-### Jain's Fairness Index Interpretation
+### Jain's Fairness Index Interpretation [10]
 
 The three runs together reveal how scale exposes the character of each algorithm's fairness guarantee:
 
@@ -301,12 +333,18 @@ The three runs together reveal how scale exposes the character of each algorithm
 | RH starvation (structural) | Yes — 37.5 s | Yes — 27.6 s | Yes — 32.0 s |
 | Starvation-free algorithms complete? | Yes — all 3 | **Yes — all 3** | **Yes — all 3** |
 
-For Java applications, **Monitor / Condition Variables** provides the best practical balance across all three configurations: structurally starvation-free, consistently lowest hungry-wait overhead, fastest wall-clock, and near-perfect JFI at every scale. **Arbitrator** is a competitive alternative with excellent JFI (0.9995 at N=21) and matching hungry-wait at scale, though its central-waiter `notifyAll()` creates more inter-philosopher competition than Monitor's targeted signals. **Chandy/Misra** offers the only lock-free design and frequently leads in JFI, but pays a growing coordination cost as N increases (highest hungry-wait and slowest wall-clock in all three configurations). **Resource Hierarchy** remains the simplest to implement but structurally degrades under load: the starvation detector fires at every scale, hungry-wait spreads widen with N, and the JFI reflects real access inequality that its ordering-based deadlock prevention cannot prevent [3].
+For Java applications, **Monitor / Condition Variables** provides the best practical balance across all three configurations: structurally starvation-free, consistently lowest hungry-wait overhead, fastest wall-clock, and near-perfect JFI at every scale. **Arbitrator** is a competitive alternative with excellent JFI (0.9995 at N=21) and matching hungry-wait at scale, though its central-waiter `notifyAll()` creates more inter-philosopher competition than Monitor's targeted signals. **Chandy/Misra** offers the only lock-free design and frequently leads in JFI, but pays a growing coordination cost as N increases (highest hungry-wait and slowest wall-clock in all three configurations). **Resource Hierarchy** remains the simplest to implement but structurally degrades under load: the starvation detector fires at every scale, hungry-wait spreads widen with N, and the JFI reflects real access inequality that its ordering-based deadlock prevention cannot prevent.
 
 ## Citations
-1. Hoare, C. A. R. (1978). Communicating sequential processes. *Communications of the ACM*, 21(8), 666–677. https://doi.org/10.1145/359576.359585
-1. Silberschatz, A., Galvin, P. B., & Gagne, G. (2018). *Operating System Concepts* (10th ed.). Wiley.
-1. Dijkstra, E. W. (1968). Cooperating sequential processes. In F. Genuys (Ed.), *Programming Languages*. Academic Press, pp. 43–112.
+1. “Dining philosophers problem,” Wikipedia, Jun. 24, 2021. https://en.wikipedia.org/wiki/Dining_philosophers_problem (accessed Apr. 02, 2026).
+1. C. A. R. Hoare, Communicating Sequential Processes. Prentice Hall, 2004. Accessed: Apr. 02, 2026. [Online]. Available: https://antares.sip.ucm.es/~luis/doctorado06-07/cspbook.pdf
+1. E. Dijkstra, “Hierarchical Ordening of Sequential Processes,” University of Texas Computer Science Department, Jun. 1971. https://www.cs.utexas.edu/~EWD/ewd03xx/EWD310.PDF (accessed Apr. 02, 2026).
+1. E. Dijkstra, “EWD 123 Cooperating sequential processes ,” 1968. Accessed: Apr. 02, 2026. [Online]. Available: https://harrymoreno.com/assets/greatPapersInCompSci/5.1_-_Cooperating_sequential_processes-Edsger_W._Dijkstra.pdf
 1. Chandy, K. M., & Misra, J. (1984). The drinking philosophers problem. *ACM Transactions on Programming Languages and Systems*, 6(4), 632–646. https://doi.org/10.1145/1780.1804
-1. Hoare, C. A. R. (1974). Monitors: An operating system structuring concept. *Communications of the ACM*, 17(10), 549–557. https://doi.org/10.1145/355620.361161
-
+1. Hoare, C. A. R. (1974). Monitors: An operating system structuring concept. *Communications of the ACM*, 17(10), 549–557.
+1. S. Krishnaprasad. (April 2003). Concurrent/Distributed programming illustrated using the dining philosophers problem. *J. Comput. Sci. Coll.*, 18(4), 104–110.
+1. J. Rodleitne, “The Dining Philosophers Problem,” Diningphilosophers.eu, 2025. https://diningphilosophers.eu/ (accessed Apr. 02, 2026).
+1. A. Tannenbaum and H. Bos, “MODERN OPERATING SYSTEMS FOURTH EDITION,” Pearson, New Jersey, 2015. Accessed: Apr. 02, 2026. [Online]. Available: https://os.ecci.ucr.ac.cr/slides/Andrew-S.-Tanenbaum-Modern-Operating-Systems.pdf
+1. R. Jain, A. Durresi, and G. Babic, “Throughput Fairness Index: Throughput Fairness Index: An An Explaination Explaination,” 1999. Accessed: Apr. 15, 2026. [Online]. Available: https://www.cse.wustl.edu/~jain/atmf/ftp/af_fair.pdf
+1. A. Silberschatz, P. B. Galvin, and G. Gagne, Operating System Concepts, 10th ed. Hoboken, Nj: Wiley, 2018. Accessed: Apr. 02, 2026. [Online]. Available: https://os.ecci.ucr.ac.cr/slides/Abraham-Silberschatz-Operating-System-Concepts-10th-2018.pdf
+1. B. Goetz, Java Concurrency in Practice. Upper Saddle River, Nj: Addison-Wesley, 2006.

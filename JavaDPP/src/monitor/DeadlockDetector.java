@@ -10,7 +10,10 @@ import net.jcip.annotations.ThreadSafe;
 import solutions.DiningRunner;
 
 /**
- * Daemon monitor that detects deadlock via two mechanisms.
+ * Daemon monitor that detects deadlock via two mechanisms. Two mechanisms are used to
+ * distinguish between deadlock and progress stall. This is because deadlock detection is
+ * only useful for lock-based algorithms, while progress stall detection is only useful for
+ * message-passing algorithms.
  *
  * <ol>
  *   <li>JVM lock-cycle detection ({@link ThreadMXBean#findDeadlockedThreads()}) — covers
