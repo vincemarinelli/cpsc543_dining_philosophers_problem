@@ -1,0 +1,163 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
+  <diagram name="Monitor Algorithm" id="act-monitor">
+    <mxGraphModel dx="1237" dy="1057" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Monitor / Condition Variables Algorithm (per Philosopher thread)" style="text;html=1;fontSize=16;fontStyle=1;align=center;fillColor=none;strokeColor=none;" parent="1" vertex="1">
+          <mxGeometry x="240" y="10" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="check_cycles" value="cyclesCompleted &amp;lt;&lt;br&gt;targetCycles?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="230" y="120" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="think" value="State = THINKING&lt;br&gt;sleep(random 100..500ms)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="215" y="240" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="pickup_call" value="pickUp(i):&lt;br&gt;lock.lockInterruptibly()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="225" y="320" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="set_hungry" value="state[i] = HUNGRY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="225" y="400" width="150" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="test_self" value="test(i)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="245" y="470" width="110" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="check_eating" value="state[i] == EATING?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="220" y="540" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="await" value="self[i].await()&lt;br&gt;(release lock, block)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="430" y="555" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="unlock_pickup" value="lock.unlock()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="240" y="660" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="eat" value="State = EATING&lt;br&gt;sleep(random 100..500ms)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="210" y="730" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="putdown_call" value="putDown(i):&lt;br&gt;lock.lock()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="225" y="820" width="150" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="set_thinking" value="state[i] = THINKING" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="220" y="900" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="test_neighbors" value="test(left); test(right)&lt;br&gt;may signal neighbors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11;" parent="1" vertex="1">
+          <mxGeometry x="210" y="970" width="180" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="unlock_putdown" value="lock.unlock()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=12;" parent="1" vertex="1">
+          <mxGeometry x="240" y="1050" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="note1" value="test(i) sets state[i] = EATING&lt;br&gt;ONLY IF state[i] == HUNGRY&lt;br&gt;AND neighbors are not EATING.&lt;br&gt;Then it signals self[i]." style="shape=note;size=15;fillColor=#ffff88;strokeColor=#36393d;fontSize=10;whiteSpace=wrap;html=1;align=left;" parent="1" vertex="1">
+          <mxGeometry x="430" y="370" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="note2" value="One Condition per philosopher&lt;br&gt;allows targeted wake-ups,&lt;br&gt;avoiding thundering herd" style="shape=note;size=15;fillColor=#ffff88;strokeColor=#36393d;fontSize=10;whiteSpace=wrap;html=1;align=left;" parent="1" vertex="1">
+          <mxGeometry x="650" y="500" width="150" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="note3" value="Releasing chopsticks signals&lt;br&gt;both neighbors so they can&lt;br&gt;re-evaluate their own state" style="shape=note;size=15;fillColor=#ffff88;strokeColor=#36393d;fontSize=10;whiteSpace=wrap;html=1;align=left;" parent="1" vertex="1">
+          <mxGeometry x="430" y="900" width="140" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="check_cycles" target="think" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2lbl" value="Yes" style="edgeLabel;html=1;fontSize=10;" parent="e2" vertex="1" connectable="0">
+          <mxGeometry x="-0.3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2b" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="check_cycles" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="500" y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e2blbl" value="No" style="edgeLabel;html=1;fontSize=10;" parent="e2b" vertex="1" connectable="0">
+          <mxGeometry x="-0.3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="think" target="pickup_call" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="pickup_call" target="set_hungry" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="set_hungry" target="test_self" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="test_self" target="check_eating" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="check_eating" target="await" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7lbl" value="No" style="edgeLabel;html=1;fontSize=10;" parent="e7" vertex="1" connectable="0">
+          <mxGeometry x="-0.3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7b" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="check_eating" target="unlock_pickup" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e7blbl" value="Yes" style="edgeLabel;html=1;fontSize=10;" parent="e7b" vertex="1" connectable="0">
+          <mxGeometry x="-0.3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7c" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;exitX=0.5;exitY=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" parent="1" source="await" target="check_eating" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="515" y="530" />
+              <mxPoint x="340" y="530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7clbl" value="signaled" style="edgeLabel;html=1;fontSize=10;fontColor=#666666;" parent="e7c" vertex="1" connectable="0">
+          <mxGeometry x="-0.2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="unlock_pickup" target="eat" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="eat" target="putdown_call" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="putdown_call" target="set_thinking" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="set_thinking" target="test_neighbors" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="test_neighbors" target="unlock_putdown" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;exitX=0;exitY=0.5;entryX=0;entryY=0.5;" parent="1" source="unlock_putdown" target="check_cycles" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="150" y="1070" />
+              <mxPoint x="150" y="160" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n1link" style="edgeStyle=none;html=1;dashed=1;endArrow=none;strokeColor=#999999;" parent="1" source="note1" target="test_self" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n2link" style="edgeStyle=none;html=1;dashed=1;endArrow=none;strokeColor=#999999;" parent="1" source="note2" target="await" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="n3link" style="edgeStyle=none;html=1;dashed=1;endArrow=none;strokeColor=#999999;" parent="1" source="note3" target="test_neighbors" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="sE8JZ9AWPo_RX05UNQqH-1" value="Start" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#ff0000;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="285" y="50" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="sE8JZ9AWPo_RX05UNQqH-2" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;verticalAlign=bottom;endArrow=open;endSize=8;strokeColor=#ff0000;rounded=0;" parent="1" source="sE8JZ9AWPo_RX05UNQqH-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="300" y="120" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="sE8JZ9AWPo_RX05UNQqH-3" value="End" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;labelPosition=center;verticalLabelPosition=bottom;align=center;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="500" y="145" width="30" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
