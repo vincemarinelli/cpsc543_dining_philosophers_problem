@@ -102,16 +102,19 @@ public interface DiningRunner {
 ```java
 public class RunnerConfig {
     int numPhilosophers;
-    int targetCycles;                  // cycles each philosopher must complete
-    int starvationCycleThreshold;      // default: 10 — max cycle-count lead any philosopher
-                                       //   can have over another before starvation fires
-    int progressPollIntervalMs;        // default: 200ms — polling rate for all monitors
-    int noProgressPollLimit;           // default: 30 — consecutive polls with no new cycle
-                                       //   completions before livelock/deadlock fires
+    int targetCycles;                     // cycles each philosopher must complete
+    int starvationCycleThreshold;         // default: 10 — absolute floor on the cycle-gap before
+                                          //   starvation fires
+    double starvationRelativeFraction;    // default: 0.20 — fraction of leader cycles used as
+                                          //   the relative threshold; effective threshold =
+                                          //   max(starvationCycleThreshold, floor(leader × fraction))
+    int progressPollIntervalMs;           // default: 200ms — polling rate for all monitors
+    int noProgressPollLimit;              // default: 30 — consecutive polls with no new cycle
+                                          //   completions before livelock/deadlock fires
 }
 ```
 
-**Why `starvationCycleThreshold` is relative:** Comparing a philosopher's cycle count against the current leader's count rather than against a wall-clock threshold makes detection independent of solution speed. A fast solution and a slow solution both fire starvation at the same relative lag, keeping the threshold meaningful across all four implementations.
+**Why the threshold is adaptive:** Using `max(absoluteFloor, floor(leaderCycles × fraction))` keeps detection meaningful across all scales. The absolute floor (10) catches real starvation early in a run before the relative term grows; the relative fraction (0.20) prevents false positives at large N, where random [100 ms, 500 ms] think/eat variance can temporarily produce cycle-count gaps that exceed any small fixed threshold even in starvation-free algorithms.
 
 ### `Philosopher` (Thread)
 
@@ -233,13 +236,16 @@ All three monitors run as daemon threads polling at `progressPollIntervalMs`. Ea
 
 ### `StarvationDetector`
 
-Starvation is defined as one philosopher falling too far behind the current leader in cycle completions. This is solution-speed-independent: whether the simulation is fast or slow, the threshold is always a relative cycle gap.
+Starvation is defined as one philosopher falling too far behind the current leader in cycle completions. Detection is cycle-count-relative and independent of wall-clock speed.
 
 - At each poll, compute `maxCycles = max(philosopher.getCyclesCompleted())`.
-- If `maxCycles - philosopher[i].getCyclesCompleted() > starvationCycleThreshold` for any `i`, starvation is declared.
+- Compute `threshold = max(starvationCycleThreshold, floor(maxCycles × starvationRelativeFraction))`.
+- If `maxCycles - philosopher[i].getCyclesCompleted() > threshold` for any `i`, starvation is declared.
+
+The adaptive threshold prevents false positives at large N: at small cycle counts the absolute floor (10) dominates; once the leader advances, the relative term (20% of leader cycles) takes over, scaling the allowed gap with run progress so that random timing variance in starvation-free algorithms does not trigger premature termination.
 
 ```
-[ERROR] Starvation detected: P2 is 11 cycles behind the leader (P0: 14, P2: 3). Terminating.
+[ERROR] Starvation detected: P2 is 25 cycles behind the leader (P0: 120, P2: 95). Terminating.
 ```
 
 ### `LivelockDetector`

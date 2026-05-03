@@ -6,6 +6,7 @@ JavaDPP/lib/
 JavaDPP/reports/
 JavaDPP/coverage/
 JavaDPP/.venv/
+JavaDPP/pptx_unpacked/
 !**/src/main/**/out/
 !**/src/test/**/out/
 

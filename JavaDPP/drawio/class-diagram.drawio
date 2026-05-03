@@ -64,7 +64,7 @@
         <mxCell id="cls_runnerconfig" value="&lt;b&gt;RunnerConfig&lt;/b&gt;" style="swimlane;fontStyle=0;align=center;html=1;startSize=26;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="pkg_model" vertex="1">
           <mxGeometry x="10" y="40" width="280" height="110" as="geometry" />
         </mxCell>
-        <mxCell id="cls_rc_f" value="+ numPhilosophers: int&#xa;+ targetCycles: int&#xa;+ starvationCycleThreshold: int&#xa;+ progressPollIntervalMs: int&#xa;+ noProgressPollLimit: int" style="text;align=left;html=0;fontSize=11;whiteSpace=wrap;" parent="cls_runnerconfig" vertex="1">
+        <mxCell id="cls_rc_f" value="+ numPhilosophers: int&#xa;+ targetCycles: int&#xa;+ starvationCycleThreshold: int&#xa;+ starvationRelativeFraction: double&#xa;+ progressPollIntervalMs: int&#xa;+ noProgressPollLimit: int" style="text;align=left;html=0;fontSize=11;whiteSpace=wrap;" parent="cls_runnerconfig" vertex="1">
           <mxGeometry y="26" width="280" height="84" as="geometry" />
         </mxCell>
         <mxCell id="cls_simstats" value="&lt;b&gt;SimulationStats&lt;/b&gt;" style="swimlane;fontStyle=0;align=center;html=1;startSize=26;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="pkg_model" vertex="1">

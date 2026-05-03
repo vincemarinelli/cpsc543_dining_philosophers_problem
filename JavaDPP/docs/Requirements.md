@@ -125,7 +125,7 @@ where `N` is the minimum `cyclesCompleted` across all philosophers, state labels
 
 **FR-24** Three monitor daemons shall run as daemon threads, each polling at `progressPollIntervalMs` (default 200 ms). All three hold a `DiningRunner` reference and call `runner.stop(reason)` on detection.
 
-**FR-25 — Starvation Detector:** At each poll interval, compute `maxCycles = max(philosopher.cyclesCompleted)` across all philosophers. Starvation is declared when any philosopher's cycle count falls more than `starvationCycleThreshold` (default 10) behind `maxCycles`. Detection is cycle-count-relative, independent of wall-clock speed.
+**FR-25 — Starvation Detector:** At each poll interval, compute `maxCycles = max(philosopher.cyclesCompleted)` across all philosophers. Compute an adaptive threshold `T = max(starvationCycleThreshold, floor(maxCycles × starvationRelativeFraction))`, where `starvationCycleThreshold` defaults to 10 and `starvationRelativeFraction` defaults to 0.20. Starvation is declared when any philosopher's cycle count falls more than `T` behind `maxCycles`. The absolute floor prevents starvation going undetected early in a run; the relative term prevents false positives at large N where random timing variance in starvation-free algorithms can temporarily exceed any small fixed gap.
 
 **FR-26 — Livelock Detector:** Maintain a rolling sum of all `cyclesCompleted`. Livelock is declared when this sum has not increased for `noProgressPollLimit` (default 30) consecutive polls *and* at least one philosopher thread is in the `RUNNABLE` state.
 

@@ -1,11 +1,11 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
   <diagram name="Arbitrator Algorithm" id="act-arbitrator">
-    <mxGraphModel dx="817" dy="1057" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="1000" math="0" shadow="0">
+    <mxGraphModel dx="1237" dy="1057" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="1000" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="title" value="Arbitrator / Waiter Algorithm (per Philosopher thread)" style="text;html=1;fontSize=16;fontStyle=1;align=center;fillColor=none;strokeColor=none;" parent="1" vertex="1">
-          <mxGeometry x="100" y="10" width="420" height="30" as="geometry" />
+          <mxGeometry x="141" y="10" width="420" height="30" as="geometry" />
         </mxCell>
         <mxCell id="check_cycles" value="cyclesCompleted &amp;lt;&lt;br&gt;targetCycles?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" parent="1" vertex="1">
           <mxGeometry x="230" y="120" width="140" height="80" as="geometry" />
@@ -38,7 +38,7 @@
           <mxGeometry x="205" y="890" width="190" height="50" as="geometry" />
         </mxCell>
         <mxCell id="note1" value="Waiter acts as a&lt;br&gt;centralized bottleneck&lt;br&gt;that serializes access" style="shape=note;size=15;fillColor=#ffff88;strokeColor=#36393d;fontSize=11;whiteSpace=wrap;html=1;align=left;" parent="1" vertex="1">
-          <mxGeometry x="430" y="355" width="170" height="55" as="geometry" />
+          <mxGeometry x="430" y="355" width="130" height="55" as="geometry" />
         </mxCell>
         <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=1.5;" parent="1" source="check_cycles" target="think" edge="1">
           <mxGeometry relative="1" as="geometry" />

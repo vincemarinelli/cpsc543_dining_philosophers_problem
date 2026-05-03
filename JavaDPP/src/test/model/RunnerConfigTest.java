@@ -14,16 +14,18 @@ public class RunnerConfigTest {
     assertEquals(5, c.numPhilosophers);
     assertEquals(10, c.targetCycles);
     assertEquals(10, c.starvationCycleThreshold);
+    assertEquals(0.20, c.starvationRelativeFraction, 1e-9);
     assertEquals(200, c.progressPollIntervalMs);
     assertEquals(30, c.noProgressPollLimit);
   }
 
   @Test
   void fullConstructorUsesProvidedValues() {
-    RunnerConfig c = new RunnerConfig(3, 5, 4, 50, 8);
+    RunnerConfig c = new RunnerConfig(3, 5, 4, 0.15, 50, 8);
     assertEquals(3, c.numPhilosophers);
     assertEquals(5, c.targetCycles);
     assertEquals(4, c.starvationCycleThreshold);
+    assertEquals(0.15, c.starvationRelativeFraction, 1e-9);
     assertEquals(50, c.progressPollIntervalMs);
     assertEquals(8, c.noProgressPollLimit);
   }

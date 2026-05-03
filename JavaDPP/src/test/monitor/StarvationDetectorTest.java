@@ -15,9 +15,9 @@ import org.junit.jupiter.api.Timeout;
 /** Unit tests for {@link StarvationDetector}. */
 public class StarvationDetectorTest {
 
-  /** Fast config: 10 ms poll, threshold 3, limit 30. */
+  /** Fast config: 10 ms poll, absolute threshold 3, fraction 0.0 (disables relative), limit 30. */
   private static RunnerConfig fastConfig() {
-    return new RunnerConfig(2, 100, 3, 10, 30);
+    return new RunnerConfig(2, 100, 3, 0.0, 10, 30);
   }
 
   private static Philosopher philosopherWithCycles(int id, int cycles) {

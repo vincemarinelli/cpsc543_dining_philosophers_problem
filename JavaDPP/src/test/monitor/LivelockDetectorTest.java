@@ -16,7 +16,7 @@ public class LivelockDetectorTest {
 
   /** poll=10ms, limit=3 — fires after ~40ms of stagnation. */
   private static RunnerConfig fastConfig() {
-    return new RunnerConfig(2, 100, 10, 10, 3);
+    return new RunnerConfig(2, 100, 10, 0.0, 10, 3);
   }
 
   @Test

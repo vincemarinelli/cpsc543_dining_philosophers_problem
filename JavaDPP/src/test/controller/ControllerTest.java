@@ -2,13 +2,12 @@ package test.controller;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import controller.Controller;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
-
-import controller.Controller;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

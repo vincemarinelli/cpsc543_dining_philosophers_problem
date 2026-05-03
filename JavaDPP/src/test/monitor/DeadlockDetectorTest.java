@@ -19,7 +19,7 @@ public class DeadlockDetectorTest {
 
   /** poll=10ms, limit=3 — fires after ~40ms of stagnation. */
   private static RunnerConfig fastConfig() {
-    return new RunnerConfig(2, 100, 10, 10, 3);
+    return new RunnerConfig(2, 100, 10, 0.0, 10, 3);
   }
 
   /** A philosopher whose {@code run()} sleeps indefinitely — thread state = TIMED_WAITING. */
@@ -152,7 +152,9 @@ public class DeadlockDetectorTest {
             lockB.lockInterruptibly(); // blocks here — creates circular wait with p1
             lockB.unlock();
           } finally {
-            if (lockA.isHeldByCurrentThread()) lockA.unlock();
+            if (lockA.isHeldByCurrentThread()) {
+              lockA.unlock();
+            }
           }
         } catch (InterruptedException e) {
           Thread.currentThread().interrupt();
@@ -171,7 +173,9 @@ public class DeadlockDetectorTest {
             lockA.lockInterruptibly(); // blocks here — creates circular wait with p0
             lockA.unlock();
           } finally {
-            if (lockB.isHeldByCurrentThread()) lockB.unlock();
+            if (lockB.isHeldByCurrentThread()) {
+              lockB.unlock();
+            }
           }
         } catch (InterruptedException e) {
           Thread.currentThread().interrupt();
@@ -184,7 +188,8 @@ public class DeadlockDetectorTest {
     p0.start();
     p1.start();
 
-    assertTrue(bothHoldingFirstLock.await(2, TimeUnit.SECONDS), "Threads should acquire first locks");
+    assertTrue(
+        bothHoldingFirstLock.await(2, TimeUnit.SECONDS), "Threads should acquire first locks");
     // Give JVM time to register threads as waiting in the lock ownership graph
     Thread.sleep(50);
 

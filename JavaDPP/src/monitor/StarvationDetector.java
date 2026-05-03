@@ -31,9 +31,11 @@ public class StarvationDetector implements Runnable {
           maxCycles = Math.max(maxCycles, p.getCyclesCompleted());
         }
 
+        int threshold = Math.max(config.starvationCycleThreshold,
+            (int) (maxCycles * config.starvationRelativeFraction));
         for (Philosopher p : philosophers) {
           int gap = maxCycles - p.getCyclesCompleted();
-          if (gap > config.starvationCycleThreshold) {
+          if (gap > threshold) {
             Philosopher leader = philosophers.stream()
                 .max((a, b) -> a.getCyclesCompleted() - b.getCyclesCompleted())
                 .orElse(p);
